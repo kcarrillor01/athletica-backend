@@ -1,5 +1,5 @@
-//src\main\java\com\athletica\controller\HelloController.java
-package com.athletica.controller;
+//src\main\java\com\athletica\backend\controller\HelloController.java
+package com.athletica.backend.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

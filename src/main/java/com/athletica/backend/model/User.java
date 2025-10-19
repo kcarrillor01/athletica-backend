@@ -3,6 +3,7 @@ package com.athletica.backend.model;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,6 +44,7 @@ public class User {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "role_id", nullable = false, foreignKey = @ForeignKey(name = "fk_users_roles"))
+  @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
   private Role role;
 
   @Column(name = "created_at", nullable = false)
