@@ -11,18 +11,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "favorites", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id",
     "product_id" }, name = "uq_fav_user_product"))
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+
 public class Favorite {
   @Id
   @Column(length = 36)
@@ -38,4 +31,47 @@ public class Favorite {
 
   @Column(name = "added_at", nullable = false)
   private LocalDateTime addedAt;
+
+  public Favorite() {
+  }
+
+  public Favorite(String id, User user, Product product, LocalDateTime addedAt) {
+    this.id = id;
+    this.user = user;
+    this.product = product;
+    this.addedAt = addedAt;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public User getUser() {
+    return user;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
+  }
+
+  public Product getProduct() {
+    return product;
+  }
+
+  public void setProduct(Product product) {
+    this.product = product;
+  }
+
+  public LocalDateTime getAddedAt() {
+    return addedAt;
+  }
+
+  public void setAddedAt(LocalDateTime addedAt) {
+    this.addedAt = addedAt;
+  }
+
 }

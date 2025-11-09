@@ -11,17 +11,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "order_items")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+
 public class OrderItem {
   @Id
   @Column(length = 36)
@@ -45,4 +38,75 @@ public class OrderItem {
 
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt;
+
+  public OrderItem() {
+  }
+
+  public OrderItem(String id, Order order, Product product, Integer quantity, BigDecimal unitPrice,
+      BigDecimal lineTotal, LocalDateTime createdAt) {
+    this.id = id;
+    this.order = order;
+    this.product = product;
+    this.quantity = quantity;
+    this.unitPrice = unitPrice;
+    this.lineTotal = lineTotal;
+    this.createdAt = createdAt;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public Order getOrder() {
+    return order;
+  }
+
+  public void setOrder(Order order) {
+    this.order = order;
+  }
+
+  public Product getProduct() {
+    return product;
+  }
+
+  public void setProduct(Product product) {
+    this.product = product;
+  }
+
+  public Integer getQuantity() {
+    return quantity;
+  }
+
+  public void setQuantity(Integer quantity) {
+    this.quantity = quantity;
+  }
+
+  public BigDecimal getUnitPrice() {
+    return unitPrice;
+  }
+
+  public void setUnitPrice(BigDecimal unitPrice) {
+    this.unitPrice = unitPrice;
+  }
+
+  public BigDecimal getLineTotal() {
+    return lineTotal;
+  }
+
+  public void setLineTotal(BigDecimal lineTotal) {
+    this.lineTotal = lineTotal;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
 }

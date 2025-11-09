@@ -1,17 +1,17 @@
 package com.athletica.backend.service;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-import com.athletica.backend.repository.OrderRepository;
-import com.athletica.backend.repository.ProductRepository;
+import com.athletica.backend.dto.CreateOrderRequest;
+import com.athletica.backend.dto.OrderDto;
 
-import lombok.RequiredArgsConstructor;
 
-@Service
-@RequiredArgsConstructor
-public class OrderService {
-  private final ProductRepository productRepository;
-  private final OrderRepository orderRepository;
 
-  
+public interface OrderService {
+  OrderDto createOrder(CreateOrderRequest request);
+
+  List<OrderDto> getAllOrders();
+
+  List<OrderDto> getOrdersForUser(String userId);
+
 }

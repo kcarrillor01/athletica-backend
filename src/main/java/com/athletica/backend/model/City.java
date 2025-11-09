@@ -9,20 +9,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Entity
 @Table(name = "cities", uniqueConstraints = @UniqueConstraint(columnNames = { "country_id",
     "name" }, name = "uq_city_country_name"))
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+
 public class City {
   @Id
   @Column(length = 36)
@@ -30,8 +21,6 @@ public class City {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "country_id", nullable = false, foreignKey = @ForeignKey(name = "fk_city_country"))
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   private Country country;
 
   @Column(nullable = false)
@@ -39,4 +28,47 @@ public class City {
 
   @Column(name = "postal_prefix")
   private String postalPrefix;
+
+  public City() {
+  }
+
+  public City(String id, Country country, String name, String postalPrefix) {
+    this.id = id;
+    this.country = country;
+    this.name = name;
+    this.postalPrefix = postalPrefix;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public Country getCountry() {
+    return country;
+  }
+
+  public void setCountry(Country country) {
+    this.country = country;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getPostalPrefix() {
+    return postalPrefix;
+  }
+
+  public void setPostalPrefix(String postalPrefix) {
+    this.postalPrefix = postalPrefix;
+  }
+
 }
