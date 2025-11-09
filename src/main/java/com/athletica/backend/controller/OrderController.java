@@ -49,7 +49,7 @@ public class OrderController {
   /**
    * Obtener pedidos del usuario autenticado.
    */
-  @GetMapping("/")
+  @GetMapping("/my")
   public ResponseEntity<ApiResponse<List<OrderDto>>> getMyOrders(Authentication authentication) {
     if (authentication == null || authentication.getName() == null) {
       return ResponseEntity.status(401).body(new ApiResponse<>(401, "No autenticado", null));

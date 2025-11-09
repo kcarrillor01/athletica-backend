@@ -19,11 +19,18 @@ import com.athletica.backend.model.Address;
 import com.athletica.backend.model.Order;
 import com.athletica.backend.model.OrderItem;
 import com.athletica.backend.model.OrderStatus;
+import com.athletica.backend.model.Payment;
+import com.athletica.backend.model.PaymentMethod;
+import com.athletica.backend.model.PaymentStatus;
 import com.athletica.backend.model.Product;
+import com.athletica.backend.model.Shipment;
+import com.athletica.backend.model.ShipmentStatus;
 import com.athletica.backend.model.User;
 import com.athletica.backend.repository.AddressRepository;
 import com.athletica.backend.repository.OrderRepository;
+import com.athletica.backend.repository.PaymentRepository;
 import com.athletica.backend.repository.ProductRepository;
+import com.athletica.backend.repository.ShipmentRepository;
 import com.athletica.backend.service.OrderService;
 
 @Service
@@ -34,13 +41,18 @@ public class OrderServiceImpl implements OrderService {
   private final ProductRepository productRepository;
   private final AddressRepository addressRepository;
   private final OrderMapper orderMapper;
+  private final ShipmentRepository shipmentRepository;
+  private final PaymentRepository paymentRepository;
 
   public OrderServiceImpl(OrderRepository orderRepository, ProductRepository productRepository,
-      AddressRepository addressRepository, OrderMapper orderMapper) {
+      AddressRepository addressRepository, OrderMapper orderMapper,
+      ShipmentRepository shipmentRepository, PaymentRepository paymentRepository) { 
     this.orderRepository = orderRepository;
     this.productRepository = productRepository;
     this.addressRepository = addressRepository;
     this.orderMapper = orderMapper;
+    this.shipmentRepository = shipmentRepository;
+    this.paymentRepository = paymentRepository;
   }
 
   @Override
@@ -130,6 +142,42 @@ public class OrderServiceImpl implements OrderService {
     order.setTotal(subtotal.add(tax).add(shipping));
 
     Order saved = orderRepository.save(order);
+
+    // crear y persistir shipment
+    Shipment shipment = new Shipment();
+    shipment.setId(UUID.randomUUID().toString());
+    shipment.setOrder(saved);
+    shipment.setCourier(null);
+    shipment.setTrackingNumber(null);
+    shipment.setStatus(ShipmentStatus.PENDING);
+    shipment.setCreatedAt(LocalDateTime.now());
+
+    Shipment savedShipment = shipmentRepository.save(shipment);
+
+    // añadir shipment a la entidad en memoria (si la colección existe)
+    try {
+      if (saved.getShipments() != null) {
+        saved.getShipments().add(savedShipment);
+      }
+    } catch (Exception e) {
+      // ignore si no hay relación bidireccional
+    }
+
+    // crear registro de pago inicial (PENDING) asociado a la orden
+    Payment payment = new Payment();
+    payment.setId(UUID.randomUUID().toString());
+    payment.setOrder(saved);
+    payment.setAmount(saved.getTotal()); // monto a pagar = total del pedido
+    payment.setMethod(PaymentMethod.SIMULATED); // por defecto para pruebas; cambiar si necesitas otro método
+    payment.setStatus(PaymentStatus.PENDING);
+    payment.setTransactionRef(null);
+    payment.setMetadata(null);
+    payment.setCreatedAt(LocalDateTime.now());
+
+    paymentRepository.save(payment);
+
+    // devolver DTO (si quieres incluir shipment en el DTO, asegúrate que
+    // OrderMapper lo mapea)
     return orderMapper.toDto(saved);
   }
 

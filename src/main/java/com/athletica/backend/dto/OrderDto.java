@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.athletica.backend.model.OrderStatus;
+
 public class OrderDto {
   private String id;
   private String userId;
@@ -11,6 +13,7 @@ public class OrderDto {
   private BigDecimal total;
   private LocalDateTime createdAt;
   private List<OrderItemDto> items;
+  private OrderStatus status;
 
   public static class OrderItemDto {
     private String productId;
@@ -100,4 +103,13 @@ public class OrderDto {
   public void setItems(List<OrderItemDto> items) {
     this.items = items;
   }
+
+  public OrderStatus getStatus() {
+    return status;
+  }
+
+  public void setStatus(OrderStatus status) {
+    this.status = status;
+  }
+  
 }

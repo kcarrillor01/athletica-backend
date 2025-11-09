@@ -18,7 +18,7 @@ import com.athletica.backend.security.RestAccessDeniedHandler;
 import com.athletica.backend.security.RestAuthenticationEntryPoint;
 
 @Configuration
-@EnableMethodSecurity // habilita @PreAuthorize si lo usas en controllers
+@EnableMethodSecurity
 public class SecurityConfig {
 
   private final JwtUtil jwtUtil;
@@ -37,35 +37,43 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            // excepciones públicas
+            // public
             .requestMatchers("/error").permitAll()
             .requestMatchers("/api/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
             .requestMatchers("/favicon.ico", "/static/**", "/public/**").permitAll()
 
-            // reglas específicas: recursos de administración (ponerlas antes de reglas
-            // genéricas)
-            .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
-            .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
-            .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+            // Shipments rules:
+            // - GET /api/shipments -> only ADMIN (list all shipments)
+            // - GET /api/shipments/** (individual or by order) -> authenticated
+            // (USER/ADMIN).
+            // controller will enforce owner vs admin logic for single resources.
+            // - POST /api/shipments, PUT /api/shipments/{id}, DELETE /api/shipments/{id} ->
+            // ADMIN only
+            .requestMatchers(HttpMethod.GET, "/api/shipments").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.POST, "/api/shipments").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.PUT, "/api/shipments/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.DELETE, "/api/shipments/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.GET, "/api/shipments/**").hasAnyRole("USER", "ADMIN")
 
-            // permitir a usuarios autenticados operar sobre sus direcciones
+            // Orders: allow authenticated users to create; list all orders reserved to
+            // ADMIN
+            .requestMatchers(HttpMethod.POST, "/api/orders/**").hasAnyRole("USER", "ADMIN")
+            .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
+
+            // Addresses: allow user/admin to operate on their addresses (controller checks
+            // ownership)
             .requestMatchers(HttpMethod.POST, "/api/addresses/**").hasAnyRole("USER", "ADMIN")
             .requestMatchers(HttpMethod.PUT, "/api/addresses/**").hasAnyRole("USER", "ADMIN")
             .requestMatchers(HttpMethod.DELETE, "/api/addresses/**").hasAnyRole("USER", "ADMIN")
 
-            // pedidos: permitir crear pedidos a usuarios autenticados
-            .requestMatchers(HttpMethod.POST, "/api/orders/**").hasAnyRole("USER", "ADMIN")
-            // si quieres permitir ver mis pedidos por /api/orders/my (propietario) lo
-            // manejas en controller
-            // para todo lo demás de /api/orders (GET /api/orders) ya está restringido a
-            // ADMIN arriba
+            // Admin-only patterns (generic)
+            .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
 
-            // Reglas generales al final: lectura para usuarios autenticados, otras acciones
-            // por role
+            // Default: authenticated read for API, other methods require ADMIN
             .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("USER", "ADMIN")
             .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
             .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
-            // fallback: cualquier otra petición autenticada
             .anyRequest().authenticated())
         .exceptionHandling(ex -> ex
             .authenticationEntryPoint(new RestAuthenticationEntryPoint())

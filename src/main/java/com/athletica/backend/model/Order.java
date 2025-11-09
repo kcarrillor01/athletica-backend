@@ -2,6 +2,7 @@ package com.athletica.backend.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -56,15 +57,18 @@ public class Order {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-
+    private List<Shipment> shipments = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items;
 
     public Order() {
     }
 
+
     public Order(String id, User user, Address address, OrderStatus status, BigDecimal subtotal, BigDecimal tax,
             BigDecimal shipping, BigDecimal total, LocalDateTime createdAt, LocalDateTime updatedAt,
-            List<OrderItem> items) {
+            List<Shipment> shipments, List<OrderItem> items) {
         this.id = id;
         this.user = user;
         this.address = address;
@@ -75,8 +79,10 @@ public class Order {
         this.total = total;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.shipments = shipments;
         this.items = items;
     }
+
 
     public String getId() {
         return id;
@@ -166,4 +172,15 @@ public class Order {
         this.items = items;
     }
 
+
+    public List<Shipment> getShipments() {
+        return shipments;
+    }
+
+
+    public void setShipments(List<Shipment> shipments) {
+        this.shipments = shipments;
+    }
+
+    
 }
